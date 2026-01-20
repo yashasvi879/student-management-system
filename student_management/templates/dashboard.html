@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+
+<h2>Dashboard</h2>
+<a href="/">Add New Student</a>
+
+<h3>Search Student</h3>
+<input id="search">
+<button onclick="search()">Search</button>
+<div id="result"></div>
+
+<h3>Class Statistics</h3>
+<button onclick="stats()">View Statistics</button>
+<div id="stats"></div>
+
+<h3>All Students (Update Marks)</h3>
+
+{% for s in students %}
+<form method="post" action="/update/{{ s.id }}">
+<b>{{ s.name }}</b> ({{ s.class_name }})<br>
+Math: <input name="math" value="{{ s.grades.math }}">
+Science: <input name="science" value="{{ s.grades.science }}">
+English: <input name="english" value="{{ s.grades.english }}">
+<button>Update</button>
+</form>
+<hr>
+{% endfor %}
+
+<script>
+function search(){
+    fetch("/search?name="+document.getElementById("search").value)
+    .then(r=>r.json())
+    .then(d=>{
+        document.getElementById("result").innerHTML =
+            d.map(s => s.name + " - " + s.class_name).join("<br>");
+    });
+}
+
+function stats(){
+    fetch("/stats")
+    .then(r=>r.json())
+    .then(d=>{
+        document.getElementById("stats").innerHTML =
+            "Class Average: " + d.class_avg + "<br>Top Student: " + d.top;
+    });
+}
+</script>
+
+</body>
+</html>

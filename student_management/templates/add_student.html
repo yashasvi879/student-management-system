@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Student</title>
+</head>
+<body>
+
+<h2>Add Student Details</h2>
+
+<form method="post">
+    Name: <input name="name" required><br>
+    Age: <input name="age" required><br>
+    Class: <input name="class_name" required><br>
+    Gender: <input name="gender" required><br><br>
+
+    Math: <input name="math" required>
+    Science: <input name="science" required>
+    English: <input name="english" required><br><br>
+
+    <button type="submit">Save Student</button>
+</form>
+
+{% if message %}
+<hr>
+<p style="color:green"><b>{{ message }}</b></p>
+<p>Do you want to add one more student?</p>
+
+<form action="/" method="get" style="display:inline;">
+    <button>YES</button>
+</form>
+
+<form action="/dashboard" method="get" style="display:inline;">
+    <button>NO</button>
+</form>
+{% endif %}
+
+</body>
+</html>
