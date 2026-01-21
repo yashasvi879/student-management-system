@@ -19,7 +19,26 @@ def save():
         json.dump(students, f, indent=4)
 
 
-# ---------- HOME / ADD STUDENT ----------
+# ---------- GRADE FUNCTION ----------
+def grade_from_mark(mark):
+    if mark >= 90:
+        return "A"
+    elif mark >= 75:
+        return "B"
+    elif mark >= 60:
+        return "C"
+    elif mark >= 50:
+        return "D"
+    else:
+        return "F"
+
+
+def average(student):
+    g = student["grades"]
+    return (g["math"]["mark"] + g["science"]["mark"] + g["english"]["mark"]) / 3
+
+
+# ---------- ADD STUDENT ----------
 @app.route("/", methods=["GET", "POST"])
 def add_student():
     message = None
@@ -32,9 +51,18 @@ def add_student():
             "class_name": request.form["class_name"],
             "gender": request.form["gender"],
             "grades": {
-                "math": int(request.form["math"]),
-                "science": int(request.form["science"]),
-                "english": int(request.form["english"])
+                "math": {
+                    "mark": int(request.form["math"]),
+                    "grade": grade_from_mark(int(request.form["math"]))
+                },
+                "science": {
+                    "mark": int(request.form["science"]),
+                    "grade": grade_from_mark(int(request.form["science"]))
+                },
+                "english": {
+                    "mark": int(request.form["english"]),
+                    "grade": grade_from_mark(int(request.form["english"]))
+                }
             }
         }
         students.append(student)
@@ -44,10 +72,11 @@ def add_student():
     return render_template("add_student.html", message=message)
 
 
-# ---------- DASHBOARD ----------
+# ---------- DASHBOARD (SORTED TOP → LOW) ----------
 @app.route("/dashboard")
 def dashboard():
-    return render_template("dashboard.html", students=students)
+    sorted_students = sorted(students, key=average, reverse=True)
+    return render_template("dashboard.html", students=sorted_students)
 
 
 # ---------- SEARCH ----------
@@ -63,9 +92,14 @@ def search():
 def update(id):
     for s in students:
         if s["id"] == id:
-            s["grades"]["math"] = int(request.form["math"])
-            s["grades"]["science"] = int(request.form["science"])
-            s["grades"]["english"] = int(request.form["english"])
+            s["grades"]["math"]["mark"] = int(request.form["math"])
+            s["grades"]["science"]["mark"] = int(request.form["science"])
+            s["grades"]["english"]["mark"] = int(request.form["english"])
+
+            s["grades"]["math"]["grade"] = grade_from_mark(s["grades"]["math"]["mark"])
+            s["grades"]["science"]["grade"] = grade_from_mark(s["grades"]["science"]["mark"])
+            s["grades"]["english"]["grade"] = grade_from_mark(s["grades"]["english"]["mark"])
+
             save()
             break
     return redirect("/dashboard")
@@ -77,21 +111,12 @@ def stats():
     if not students:
         return jsonify({"class_avg": 0, "top": "N/A"})
 
-    total = 0
-    top_name = ""
-    highest = 0
-
-    for s in students:
-        g = s["grades"]
-        avg = (g["math"] + g["science"] + g["english"]) / 3
-        total += avg
-        if avg > highest:
-            highest = avg
-            top_name = s["name"]
+    sorted_students = sorted(students, key=average, reverse=True)
+    class_avg = sum(average(s) for s in students) / len(students)
 
     return jsonify({
-        "class_avg": round(total / len(students), 2),
-        "top": top_name
+        "class_avg": round(class_avg, 2),
+        "top": sorted_students[0]["name"]
     })
 
 
