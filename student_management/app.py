@@ -33,9 +33,16 @@ def grade_from_mark(mark):
         return "F"
 
 
+# ---------- AVERAGE (SAFE) ----------
 def average(student):
     g = student["grades"]
-    return (g["math"]["mark"] + g["science"]["mark"] + g["english"]["mark"]) / 3
+
+    def get_mark(sub):
+        if isinstance(g[sub], dict):
+            return g[sub]["mark"]
+        return g[sub]
+
+    return (get_mark("math") + get_mark("science") + get_mark("english")) / 3
 
 
 # ---------- ADD STUDENT ----------
@@ -46,6 +53,7 @@ def add_student():
     if request.method == "POST":
         student = {
             "id": len(students) + 1,
+            "rollno": request.form["rollno"],
             "name": request.form["name"],
             "age": int(request.form["age"]),
             "class_name": request.form["class_name"],
@@ -72,11 +80,11 @@ def add_student():
     return render_template("add_student.html", message=message)
 
 
-# ---------- DASHBOARD (SORTED TOP → LOW) ----------
+# ---------- DASHBOARD ----------
 @app.route("/dashboard")
 def dashboard():
-    sorted_students = sorted(students, key=average, reverse=True)
-    return render_template("dashboard.html", students=sorted_students)
+    ranked_students = sorted(students, key=average, reverse=True)
+    return render_template("dashboard.html", students=ranked_students)
 
 
 # ---------- SEARCH ----------
@@ -87,38 +95,43 @@ def search():
     return jsonify(result)
 
 
-# ---------- UPDATE MARKS ----------
+# ---------- UPDATE FULL DETAILS ----------
 @app.route("/update/<int:id>", methods=["POST"])
 def update(id):
     for s in students:
         if s["id"] == id:
-            s["grades"]["math"]["mark"] = int(request.form["math"])
-            s["grades"]["science"]["mark"] = int(request.form["science"])
-            s["grades"]["english"]["mark"] = int(request.form["english"])
+            s["rollno"] = request.form["rollno"]
+            s["name"] = request.form["name"]
+            s["age"] = int(request.form["age"])
 
-            s["grades"]["math"]["grade"] = grade_from_mark(s["grades"]["math"]["mark"])
-            s["grades"]["science"]["grade"] = grade_from_mark(s["grades"]["science"]["mark"])
-            s["grades"]["english"]["grade"] = grade_from_mark(s["grades"]["english"]["mark"])
+            for sub in ["math", "science", "english"]:
+                mark = int(request.form[sub])
+                s["grades"][sub] = {
+                    "mark": mark,
+                    "grade": grade_from_mark(mark)
+                }
 
             save()
             break
     return redirect("/dashboard")
 
 
-# ---------- STATISTICS ----------
+# ---------- STATISTICS (ALL RANKED) ----------
 @app.route("/stats")
 def stats():
-    if not students:
-        return jsonify({"class_avg": 0, "top": "N/A"})
+    ranked = sorted(students, key=average, reverse=True)
 
-    sorted_students = sorted(students, key=average, reverse=True)
-    class_avg = sum(average(s) for s in students) / len(students)
+    output = []
+    for s in ranked:
+        output.append({
+            "rollno": s["rollno"],
+            "name": s["name"],
+            "average": round(average(s), 2)
+        })
 
-    return jsonify({
-        "class_avg": round(class_avg, 2),
-        "top": sorted_students[0]["name"]
-    })
+    return jsonify(output)
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+
