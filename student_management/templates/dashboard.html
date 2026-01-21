@@ -8,32 +8,36 @@
 <h2>Student Dashboard (Top → Low)</h2>
 <a href="/">Add New Student</a>
 
-<h3>Search Student</h3>
-<input id="search">
-<button onclick="searchStudent()">Search</button>
-<div id="result"></div>
-
-<h3>Class Statistics</h3>
-<button onclick="stats()">View Statistics</button>
+<h3>Statistics – Student Ranking</h3>
+<button onclick="loadStats()">View Statistics</button>
 <div id="stats"></div>
 
-<h3>Ranked Students</h3>
+<h3>Ranked Students (Update All Details)</h3>
 
 {% for s in students %}
 <form method="post" action="/update/{{ s.id }}">
-<b>{{ loop.index }}. {{ s.name }}</b> ({{ s.class_name }})<br>
+<b>{{ loop.index }}.</b>
+
+Roll No:
+<input name="rollno" value="{{ s.rollno }}"><br>
+
+Name:
+<input name="name" value="{{ s.name }}"><br>
+
+Age:
+<input name="age" value="{{ s.age }}"><br><br>
 
 Math:
-<input name="math" value="{{ s.grades.math.mark }}">
-Grade: <b>{{ s.grades.math.grade }}</b><br>
+<input name="math" value="{{ s.grades.math.mark if s.grades.math is mapping else s.grades.math }}">
+Grade: <b>{{ s.grades.math.grade if s.grades.math is mapping else "N/A" }}</b><br>
 
 Science:
-<input name="science" value="{{ s.grades.science.mark }}">
-Grade: <b>{{ s.grades.science.grade }}</b><br>
+<input name="science" value="{{ s.grades.science.mark if s.grades.science is mapping else s.grades.science }}">
+Grade: <b>{{ s.grades.science.grade if s.grades.science is mapping else "N/A" }}</b><br>
 
 English:
-<input name="english" value="{{ s.grades.english.mark }}">
-Grade: <b>{{ s.grades.english.grade }}</b><br>
+<input name="english" value="{{ s.grades.english.mark if s.grades.english is mapping else s.grades.english }}">
+Grade: <b>{{ s.grades.english.grade if s.grades.english is mapping else "N/A" }}</b><br>
 
 <button>Update</button>
 </form>
@@ -41,24 +45,19 @@ Grade: <b>{{ s.grades.english.grade }}</b><br>
 {% endfor %}
 
 <script>
-function searchStudent(){
-    fetch("/search?name=" + document.getElementById("search").value)
-    .then(r => r.json())
-    .then(d => {
-        document.getElementById("result").innerHTML =
-            d.map(s => s.name + " - " + s.class_name).join("<br>");
-    });
-}
-
-function stats(){
+function loadStats(){
     fetch("/stats")
     .then(r => r.json())
     .then(d => {
-        document.getElementById("stats").innerHTML =
-            "Class Average: " + d.class_avg + "<br>Top Student: " + d.top;
+        let out = "<b>Ranking (Top → Low)</b><br>";
+        d.forEach((s, i) => {
+            out += `${i+1}. Roll No: ${s.rollno} | ${s.name} | Avg: ${s.average}<br>`;
+        });
+        document.getElementById("stats").innerHTML = out;
     });
 }
 </script>
 
 </body>
 </html>
+
