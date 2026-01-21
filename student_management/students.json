@@ -1,74 +1,68 @@
 [
     {
         "id": 1,
-        "name": "abhinay",
-        "age": 20,
-        "class_name": "12",
-        "gender": "male",
-        "grades": {
-            "math": 19,
-            "science": 30,
-            "english": 12
-        }
-    },
-    {
-        "id": 2,
+        "rollno": "20231",
         "name": "abhi",
         "age": 20,
         "class_name": "12",
         "gender": "male",
         "grades": {
-            "math": 20,
-            "science": 80,
-            "english": 50
+            "math": {
+                "mark": 90,
+                "grade": "A"
+            },
+            "science": {
+                "mark": 95,
+                "grade": "A"
+            },
+            "english": {
+                "mark": 65,
+                "grade": "C"
+            }
+        }
+    },s
+    {
+        "id": 2,
+        "rollno": "2023",
+        "name": "divya",
+        "age": 16,
+        "class_name": "12",
+        "gender": "female",
+        "grades": {
+            "math": {
+                "mark": 76,
+                "grade": "B"
+            },
+            "science": {
+                "mark": 80,
+                "grade": "B"
+            },
+            "english": {
+                "mark": 50,
+                "grade": "D"
+            }
         }
     },
     {
         "id": 3,
-        "name": "rishi",
-        "age": 14,
-        "class_name": "13",
-        "gender": "male",
-        "grades": {
-            "math": 12,
-            "science": 35,
-            "english": 67
-        }
-    },
-    {
-        "id": 4,
-        "name": "keerthi",
-        "age": 16,
-        "class_name": "11",
-        "gender": "female",
-        "grades": {
-            "math": 90,
-            "science": 80,
-            "english": 80
-        }
-    },
-    {
-        "id": 5,
-        "name": "d",
-        "age": 20,
-        "class_name": "13",
-        "gender": "male",
-        "grades": {
-            "math": 12,
-            "science": 80,
-            "english": 80
-        }
-    },
-    {
-        "id": 6,
-        "name": "divya",
+        "rollno": "20232",
+        "name": "sandhya",
         "age": 98,
         "class_name": "43",
-        "gender": "female",
+        "gender": "male",
         "grades": {
-            "math": 76,
-            "science": 76,
-            "english": 98
+            "math": {
+                "mark": 12,
+                "grade": "F"
+            },
+            "science": {
+                "mark": 66,
+                "grade": "C"
+            },
+            "english": {
+                "mark": 50,
+                "grade": "D"
+            }
         }
     }
 ]
